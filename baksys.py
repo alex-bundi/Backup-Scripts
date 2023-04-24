@@ -13,7 +13,6 @@ class ZipArchives:
     
     def __init__(self, instructions):
         self.instructions = instructions
-
          
     def get_instructions(self) -> None:
         """ Gets instructions from the console and executes as per the specified instructions."""
@@ -73,9 +72,10 @@ class ZipArchives:
         for all_zips in os.listdir(self.zips_bck):
             self.lst_underscore = all_zips.rindex("_")
             self.date = all_zips[self.lst_underscore + 1:]
-            if self.date[:4] == self.specified_date[:4] and self.date[4:6] == self.specified_date[5:7] and self.date[6:8] == self.specified_date[-2:]:
-                with zipfile.ZipFile(os.path.join(self.zips_bck, all_zips), mode="r") as archive:
-                    archive.extractall(self.ext_files)
+            if self.date[:4] == self.specified_date[:4] and self.date[4:6] == self.specified_date[5:7]:
+                if self.date[6:8] == self.specified_date[-2:]:
+                    with zipfile.ZipFile(os.path.join(self.zips_bck, all_zips), mode="r") as archive:
+                        archive.extractall(self.ext_files)
 
 
 class CreateBackup:
@@ -102,13 +102,14 @@ class CreateBackup:
         self.src_system_user_path = self.json_object["source"].replace(self.user, "") 
         self.dst_system_user_path = self.json_object["destination"].replace(self.user, "") 
 
-        if os.path.exists(self.user + self.src_system_user_path) == True and os.path.exists(self.user + self.dst_system_user_path) == True:
-            self.needed_paths = []
-            self.src_file_path = self.user + self.src_system_user_path
-            self.needed_paths.append(self.src_file_path)
-            self.dst_file_path = self.user + self.dst_system_user_path
-            self.needed_paths.append(self.dst_file_path)
-            return self.needed_paths
+        if os.path.exists(self.user + self.src_system_user_path) == True: 
+            if os.path.exists(self.user + self.dst_system_user_path) == True:
+                self.src_file_path = self.user + self.src_system_user_path
+                self.dst_file_path = self.user + self.dst_system_user_path
+                self.needed_paths = []
+                self.needed_paths.append(self.src_file_path)
+                self.needed_paths.append(self.dst_file_path)
+                return self.needed_paths
         else:
             sys.exit("One of the paths(source or destination) in bak_creation_info.json is invalid or doesn't exist.")
 
